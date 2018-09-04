@@ -16,55 +16,11 @@ function UserStorage(url)
     this.sortType = 'byFirstLetter';
 }
 
-/** Отрисовка дом элементов на основании полученных данных
- * 
- * 
- * @param {any} loadResults - результат AJAX запроса
- */
-// PokemonStorage.prototype.renderPokemons = function(loadResults) {
-//     //
-//     var container = document.getElementById('container');
-//     var row = document.createElement('div');
-//     //
-//     for (var i = 0; i < loadResults['results'].length; i++) {
-//         var pokemonName = loadResults['results'][i].name;
-//         var id = i + 1;
-//         var picture = POKEMON_IMG + id + '.png';
-//         var item = document.createElement('div');
-//         var title = document.createElement('div');
-//         var img = document.createElement('img');
-//         //
-//         item.classList.add('item');
-//         title.classList.add('item__title');
-//         img.classList.add('item__img');
-//         //
-//         title.innerText = pokemonName;
-//         img.src = picture;
-
-//         item.appendChild(title);
-//         item.appendChild(img);
-//         row.appendChild(item);
-//         //Запишем данные покемона в хранилище
-//         this.arrPokemons.push({
-//             id: pokemonCount,
-//             url: loadResults['results'][i].url,
-//             name: loadResults['results'][i].name
-//         });
-//         pokemonCount++;
-//     }
-//     row.classList.add('row');
-//     container.appendChild(row);
-//     pokemons = document.querySelectorAll(".item");
-//     doPokemonsClick(pokemons);
-// }
-
-
-
 /** 
  * UserStorage method - for load user data from url
  * 
  */
-UserStorage.prototype.loadUsers = function() 
+UserStorage.prototype.init = function() 
 {
     // save context storage
     var context = this;
@@ -120,14 +76,24 @@ UserStorage.prototype.addToStorage = function(results)
         );
         uList.push(usr);
     });
-    //console.log(this.userList);
     this.renderList();
 }
 
+/**
+ * UserStorage method - render user list
+ */
 UserStorage.prototype.renderList = function()
 {
     var DOM_userList = document.getElementById('userList');
+    // save context UserStorage
+    var context = this;
 
+    // add event click on list item
+    DOM_userList.addEventListener('click',function(){
+        context.prepareOpenCard(event);
+    }); 
+
+    // render list
     this.userList.forEach(function(item,index,array)
     {
         // create DOM elements
@@ -148,7 +114,8 @@ UserStorage.prototype.renderList = function()
         DOM_title.classList.add('listItem__title');
         DOM_fName.classList.add('listItem__fName');
         DOM_lName.classList.add('listItem__lName');
-        // set data in DOM elements
+        // set data in DOM element        
+        DOM_item.dataset.id = id;
         DOM_picture.src = picture;
         DOM_title.innerHTML = title;
         DOM_fName.innerHTML = fName;
@@ -159,13 +126,29 @@ UserStorage.prototype.renderList = function()
         DOM_item.appendChild(DOM_title);
         DOM_item.appendChild(DOM_fName);
         DOM_item.appendChild(DOM_lName);
-
-
-
-
     })
 }
 
+/**
+ * UserStorage method - prepare data and call User class method renderCard
+ */
+UserStorage.prototype.prepareOpenCard = function(event)
+{
+    var target = event.target;
+    var DOM_class = target.className;
+
+    //find parent container with dataset.id
+    while(DOM_class != 'userList'){
+        if(DOM_class == 'listItem'){
+            var user = this.userList[target.dataset.id]
+            user.renderCard();
+            return;
+        }
+        target = target.parentNode;
+        DOM_class = target.className;
+    }
+    
+}
 
 /** 
  * Class User - render userCard
@@ -203,8 +186,18 @@ function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone
     this.largePic = largePic;
 }
 
+/**
+ * User method - render user card
+ * 
+ */
+User.prototype.renderCard = function()
+{
+    console.log(this.gender);
+    //create DOM elements
 
+}
 
+// init Storage
 var uStorage = new UserStorage(USERS_SRC);
-uStorage.loadUsers();
-//uStorage.renderList();
+uStorage.init();
+
