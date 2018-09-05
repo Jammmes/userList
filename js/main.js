@@ -87,7 +87,22 @@ UserStorage.prototype.newSort = function(event)
 UserStorage.prototype.sortUserList = function()
 {
 
-    return this.userList;
+    function compare(a,b)
+    {
+        if(a.fName > b.fName){
+            return 1
+        };
+        if (a.fName < b.fName){
+            return -1
+        };
+        return 0;
+    };
+
+    this.userList.sort(compare);
+
+    if (this.sortMethod === 'DESC'){
+        this.userList.reverse();
+    }
 }
 
 /** 
@@ -129,6 +144,9 @@ UserStorage.prototype.addToStorage = function(results)
 UserStorage.prototype.renderList = function()
 {
     var DOM_userList = document.getElementById('userList');
+    // clean old data
+    DOM_userList.innerHTML = "";
+
     // save context UserStorage
     var context = this;
 
@@ -138,10 +156,11 @@ UserStorage.prototype.renderList = function()
     }); 
 
     // sort user list
-    var sortUserList = this.sortUserList();
+    //var sortUserList = this.sortUserList();
+    this.sortUserList();
 
     // render list
-    sortUserList.forEach(function(item,index,array)
+    this.userList.forEach(function(item,index,array)
     {
         // create DOM elements
         var DOM_item = document.createElement('div');
@@ -187,14 +206,32 @@ UserStorage.prototype.prepareOpenCard = function(event)
     //find parent container wich contain "dataset.id" and then call render card
     while(DOM_class != 'userList'){
         if(DOM_class == 'listItem'){
-            var user = this.userList[target.dataset.id]
+            var user = this.getUserbyId(target.dataset.id);
             user.renderCard();
             return;
         }
         target = target.parentNode;
         DOM_class = target.className;
     }
-    
+}
+
+/**
+ * UserStorage.getUserById - return object User from userList by ID
+ * 
+ * @param int id 
+ */
+UserStorage.prototype.getUserbyId = function(id)
+{
+
+    function isEqual(item){
+        if (parseInt(item.id) === parseInt(id)){
+            return true
+        }
+    }
+
+    var elem = this.userList.find(isEqual);
+    console.log(this.userList);
+    return elem;
 }
 
 /** 
@@ -239,6 +276,7 @@ function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone
  */
 User.prototype.renderCard = function()
 {
+    // find some DOM elements
     var DOM_mainContainer = document.getElementById('container');
     var DOM_wrap = document.getElementById('wrap');
     //create DOM elements
@@ -380,7 +418,7 @@ User.prototype.renderCard = function()
     DOM_cardBlock_phone.appendChild(DOM_caption_phone);
     DOM_cardBlock_phone.appendChild(DOM_value_phone);
 
-    // setting modal view
+    // setting modal view user card
     DOM_wrap.style.display = "block";
 
     // set event click on wrap for delete card and hide wrap
