@@ -4,6 +4,20 @@
     box-sizing: border-box;
 }
 
+#wrap{
+    display: none;
+    opacity: 0.8;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 15px;
+    background-color: rgba(1, 1, 1, 0.725);
+    z-index: 100;
+    overflow: auto;
+}
+
 .mainContainer{
     display:flex;
     flex-direction: column;
@@ -83,9 +97,16 @@ text-decoration: none;
     justify-content: center;
     border: 4px solid silver;
     border-radius: 5%;
-    width:25%;
-    padding: 10px;
-    margin: 10px;
+    width:30%;
+    margin: 10px auto;
+	background: #fff;
+	z-index: 200;
+	position: fixed;
+    padding: 15px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
 }
 
 .cardBlock{

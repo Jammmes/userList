@@ -193,6 +193,7 @@ function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone
 User.prototype.renderCard = function()
 {
     var DOM_mainContainer = document.getElementById('container');
+    var DOM_wrap = document.getElementById('wrap');
     //create DOM elements
     var DOM_userCard = document.createElement('div');
 
@@ -234,8 +235,10 @@ User.prototype.renderCard = function()
     var DOM_caption_phone = document.createElement('div');
     var DOM_value_phone = document.createElement('div');
     
-    // add classes to DOM elements
+    // add classes/id to DOM elements
     DOM_userCard.classList.add('userCard');
+    DOM_userCard.setAttribute('id','userCard');
+
     DOM_cardBlock_img.classList.add('cardBlock');
     DOM_cardBlock_id.classList.add('cardBlock');
     DOM_cardBlock_common_name.classList.add('cardBlock');
@@ -329,6 +332,17 @@ User.prototype.renderCard = function()
 
     DOM_cardBlock_phone.appendChild(DOM_caption_phone);
     DOM_cardBlock_phone.appendChild(DOM_value_phone);
+
+    // setting modal view
+    DOM_wrap.style.display = "block";
+
+    // set event click on wrap
+    DOM_wrap.addEventListener("click",function(){
+        this.style.display = "none";
+        var userCard = document.getElementById('userCard');
+        console.log(userCard);
+        userCard.remove();
+    });
 
 }
 
