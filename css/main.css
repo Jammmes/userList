@@ -77,17 +77,37 @@ text-decoration: none;
     font-weight: 700;
 }
 
-.userCard{}
-.cardBlock{}
+.userCard{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 4px solid silver;
+    border-radius: 5%;
+    width:25%;
+    padding: 10px;
+    margin: 10px;
+}
 
-.cardBlock__id{}
-.cardBlock__picture{}
-.cardBlock__title{}
-.cardBlock__lName{}
-.cardBlock__fName{}
-.cardBlock__street{}
-.cardBlock__city{}
-.cardBlock__state{}
-.cardBlock__postcard{}
-.cardBlock__email{}
-.cardBlock__phone{}
+.cardBlock{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border-top: 1px solid silver;
+    border-bottom: 1px solid silver;
+}
+.cardBlock_clear{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.cardBlock__value{
+    margin: 5px 10px 5px 5px;
+}
+.cardBlock__caption{
+    color: dimgray;
+    margin-right: 10px;
+}
+

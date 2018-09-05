@@ -108,7 +108,7 @@ UserStorage.prototype.renderList = function()
         var fName = item.fName;
         var lName = item.lName;
         var id = item.id;
-        // add class for DOM elements
+        // add classes to DOM elements
         DOM_item.classList.add('listItem');
         DOM_picture.classList.add('listItem__picture');
         DOM_title.classList.add('listItem__title');
@@ -137,7 +137,7 @@ UserStorage.prototype.prepareOpenCard = function(event)
     var target = event.target;
     var DOM_class = target.className;
 
-    //find parent container with dataset.id
+    //find parent container wich contain dataset.id and then call render
     while(DOM_class != 'userList'){
         if(DOM_class == 'listItem'){
             var user = this.userList[target.dataset.id]
@@ -151,7 +151,7 @@ UserStorage.prototype.prepareOpenCard = function(event)
 }
 
 /** 
- * Class User - render userCard
+ * Class User - save user data and render userCard
  * 
  * @param int id 
  * @param string gender 
@@ -192,8 +192,143 @@ function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone
  */
 User.prototype.renderCard = function()
 {
-    console.log(this.gender);
+    var DOM_mainContainer = document.getElementById('container');
     //create DOM elements
+    var DOM_userCard = document.createElement('div');
+
+    var DOM_cardBlock_img = document.createElement('div');
+    var DOM_value_img = document.createElement('img');
+
+    var DOM_cardBlock_id = document.createElement('div');
+    var DOM_caption_id  = document.createElement('div');
+    var DOM_value_id  = document.createElement('div');
+
+    var DOM_cardBlock_common_name = document.createElement('div');
+    var DOM_caption_name = document.createElement('div');
+    var DOM_cardBlock_clear = document.createElement('div');
+    var DOM_value_title = document.createElement('div');
+    var DOM_value_fName = document.createElement('div');
+    var DOM_value_lName = document.createElement('div');
+
+    var DOM_cardBlock_street = document.createElement('div');
+    var DOM_caption_street = document.createElement('div');
+    var DOM_value_street = document.createElement('div');
+
+    var DOM_cardBlock_city = document.createElement('div');
+    var DOM_caption_city = document.createElement('div');
+    var DOM_value_city = document.createElement('div');
+
+    var DOM_cardBlock_state = document.createElement('div');
+    var DOM_caption_state = document.createElement('div');
+    var DOM_value_state = document.createElement('div');
+
+    var DOM_cardBlock_postcode = document.createElement('div');
+    var DOM_caption_postcode = document.createElement('div');
+    var DOM_value_postcode = document.createElement('div');
+
+    var DOM_cardBlock_email = document.createElement('div');
+    var DOM_caption_email = document.createElement('div');
+    var DOM_value_email = document.createElement('div');
+
+    var DOM_cardBlock_phone = document.createElement('div');
+    var DOM_caption_phone = document.createElement('div');
+    var DOM_value_phone = document.createElement('div');
+    
+    // add classes to DOM elements
+    DOM_userCard.classList.add('userCard');
+    DOM_cardBlock_img.classList.add('cardBlock');
+    DOM_cardBlock_id.classList.add('cardBlock');
+    DOM_cardBlock_common_name.classList.add('cardBlock');
+    DOM_cardBlock_clear.classList.add('cardBlock_clear');
+    DOM_cardBlock_city.classList.add('cardBlock');
+    DOM_cardBlock_street.classList.add('cardBlock');
+    DOM_cardBlock_state.classList.add('cardBlock');
+    DOM_cardBlock_postcode.classList.add('cardBlock');
+    DOM_cardBlock_email.classList.add('cardBlock');
+    DOM_cardBlock_phone.classList.add('cardBlock');
+
+    DOM_caption_id.classList.add('cardBlock__caption');
+    DOM_caption_name.classList.add('cardBlock__caption');
+    DOM_caption_city.classList.add('cardBlock__caption');
+    DOM_caption_street.classList.add('cardBlock__caption');
+    DOM_caption_state.classList.add('cardBlock__caption');
+    DOM_caption_postcode.classList.add('cardBlock__caption');
+    DOM_caption_email.classList.add('cardBlock__caption');
+    DOM_caption_phone.classList.add('cardBlock__caption');
+
+    DOM_value_img.classList.add('cardBlock__value');
+    DOM_value_id.classList.add('cardBlock__value');
+    DOM_value_title.classList.add('cardBlock__value');
+    DOM_value_fName.classList.add('cardBlock__value');
+    DOM_value_lName.classList.add('cardBlock__value');
+    DOM_value_city.classList.add('cardBlock__value');
+    DOM_value_street.classList.add('cardBlock__value');
+    DOM_value_state.classList.add('cardBlock__value');
+    DOM_value_postcode.classList.add('cardBlock__value');
+    DOM_value_email.classList.add('cardBlock__value');
+    DOM_value_phone.classList.add('cardBlock__value');
+    // set data in DOM elements
+    DOM_caption_id.innerHTML = "ID: ";
+    DOM_caption_name.innerHTML = "NAME: ";
+    DOM_caption_city.innerHTML = "CITY: ";
+    DOM_caption_street.innerHTML = "STREET: ";
+    DOM_caption_state.innerHTML = "STATE: ";
+    DOM_caption_postcode.innerHTML = "POSTCODE: ";
+    DOM_caption_email.innerHTML = "EMAIL: ";
+    DOM_caption_phone.innerHTML = "PHONE: ";
+
+    DOM_value_img.src = this.largePic;
+    DOM_value_id.innerHTML = this.id;
+    DOM_value_title.innerHTML = this.title;
+    DOM_value_fName.innerHTML = this.fName;
+    DOM_value_lName.innerHTML = this.lName;
+    DOM_value_city.innerHTML = this.city;
+    DOM_value_street.innerHTML = this.street;
+    DOM_value_state.innerHTML = this.state;
+    DOM_value_postcode.innerHTML = this.postcode;
+    DOM_value_email.innerHTML = this.email;
+    DOM_value_phone.innerHTML = this.phone;
+    //create DOM structure
+    DOM_mainContainer.appendChild(DOM_userCard);
+
+    DOM_userCard.appendChild(DOM_cardBlock_img);
+    DOM_userCard.appendChild(DOM_cardBlock_id);
+    DOM_userCard.appendChild(DOM_cardBlock_common_name);
+    DOM_userCard.appendChild(DOM_cardBlock_street);
+    DOM_userCard.appendChild(DOM_cardBlock_city);
+    DOM_userCard.appendChild(DOM_cardBlock_state);
+    DOM_userCard.appendChild(DOM_cardBlock_postcode);
+    DOM_userCard.appendChild(DOM_cardBlock_email);
+    DOM_userCard.appendChild(DOM_cardBlock_phone);
+
+    DOM_cardBlock_img.appendChild(DOM_value_img);
+
+    DOM_cardBlock_id.appendChild(DOM_caption_id);
+    DOM_cardBlock_id.appendChild(DOM_value_id);
+
+    DOM_cardBlock_common_name.appendChild(DOM_caption_name);
+    DOM_cardBlock_common_name.appendChild(DOM_cardBlock_clear);
+    DOM_cardBlock_clear.appendChild(DOM_value_title);
+    DOM_cardBlock_clear.appendChild(DOM_value_fName);
+    DOM_cardBlock_clear.appendChild(DOM_value_lName);
+
+    DOM_cardBlock_street.appendChild(DOM_caption_street);
+    DOM_cardBlock_street.appendChild(DOM_value_street);
+
+    DOM_cardBlock_city.appendChild(DOM_caption_city);
+    DOM_cardBlock_city.appendChild(DOM_value_city);
+
+    DOM_cardBlock_state.appendChild(DOM_caption_state);
+    DOM_cardBlock_state.appendChild(DOM_value_state);
+
+    DOM_cardBlock_postcode.appendChild(DOM_caption_postcode);
+    DOM_cardBlock_postcode.appendChild(DOM_value_postcode);
+
+    DOM_cardBlock_email.appendChild(DOM_caption_email);
+    DOM_cardBlock_email.appendChild(DOM_value_email);
+
+    DOM_cardBlock_phone.appendChild(DOM_caption_phone);
+    DOM_cardBlock_phone.appendChild(DOM_value_phone);
 
 }
 
