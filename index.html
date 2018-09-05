@@ -11,31 +11,33 @@
     <body>
         <div id="wrap"></div>
         <div class="mainContainer">
-            <h1 class="mainContainer__title">User list</h1>
-            <div class="mainContainer__options">
-                <form action = "" >
-                    <!-- <fieldset class = "selectContainer">
-                        <legend>Sort</legend>
-                        <div> -->
-                        <fieldset class="selectBlock">
-                            <legend>Sort by:</legend>
-                            <label for = "ASC">ASC</label>
-                            <input type = "radio" name = "select" value = "0" id = "ASC"/>
-                            <label for = "DESC">DESC</label>
-                            <input type = "radio" name = "select" value = "1" id = "DESC"/>
-                        </fieldset>
-                        <!-- </div>
-                        <div>
-                        <fieldset class="selectBlock">
-                                <legend>Sort type:</legend>
-                                <label for = "L">By first letter</label>
-                                <input type = "radio" name = "type" value = "0" id = "L"/>
-                                <label for = "W">By word</label>
-                                <input type = "radio" name = "type" value = "1" id = "W"/>
-                        </fieldset>
-                        </div>
-                    </fieldset> -->
-                </form>
+            <div class="header">
+                <h1 class="header_title">User list</h1>
+                <div class="header__options">
+                    <form action = "" >
+                        <!-- <fieldset class = "selectContainer">
+                            <legend>Sort</legend>
+                            <div> -->
+                            <fieldset class="selectBlock" id = "sortBy">
+                                <legend>Sort by:</legend>
+                                <label for = "ASC">ASC</label>
+                                <input type = "radio" name = "select" value = "ASC" id = "ASC" checked/>
+                                <label for = "DESC">DESC</label>
+                                <input type = "radio" name = "select" value = "DESC" id = "DESC"/>
+                            </fieldset>
+                            <!-- </div>
+                            <div>
+                            <fieldset class="selectBlock">
+                                    <legend>Sort type:</legend>
+                                    <label for = "L">By first letter</label>
+                                    <input type = "radio" name = "type" value = "0" id = "L"/>
+                                    <label for = "W">By word</label>
+                                    <input type = "radio" name = "type" value = "1" id = "W"/>
+                            </fieldset>
+                            </div>
+                        </fieldset> -->
+                    </form>
+                </div>
             </div>
             <div class="mainContainer__content" id = "container">
                 <div class="userList" id = "userList"></div>

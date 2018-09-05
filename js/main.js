@@ -1,26 +1,34 @@
-//CONST
-var USERS_SRC = "https://api.randomuser.me/1.0/?results=50&nat=gb,us&inc=gender,name,location,email,phone,picture";
-var TIME_OUT = 15000;
-
 
 /** 
  * Class UserStorage - load,render,sort the userlist
  * 
- * @param string url - link  
  */
-function UserStorage(url)
+function UserStorage()
 {
-    this.url = url;
+    this.url = "https://api.randomuser.me/1.0/?results=50&nat=gb,us&inc=gender,name,location,email,phone,picture";
+    this.timeout = 15000;
     this.userList = [];
     this.sortMethod = 'ASC';
     this.sortType = 'byFirstLetter';
 }
 
 /** 
- * UserStorage method - for load user data from url
+ * UserStorage.init - prepare storage
  * 
  */
 UserStorage.prototype.init = function() 
+{
+    // set sorting
+    this.prepareSort();
+    // load and save user list
+    this.getUserList();
+    
+}
+
+/**
+ * UserStorage.getUserList - load and save user list
+ */
+UserStorage.prototype.getUserList = function()
 {
     // save context storage
     var context = this;
@@ -28,7 +36,7 @@ UserStorage.prototype.init = function()
     var xhr = new XMLHttpRequest();
     var url = this.url;
     xhr.open('GET', url, true);
-    xhr.timeout = TIME_OUT;
+    xhr.timeout = this.timeout;
     xhr.ontimeout = function()
     {
         console.log('Time is up. Load fail.');
@@ -47,8 +55,43 @@ UserStorage.prototype.init = function()
     }
 }
 
+/**
+ * UserStorage.prepareSort - set event on selector for sorting user list
+ */
+UserStorage.prototype.prepareSort = function ()
+{
+    var rb_ASC = document.getElementById('ASC');
+    var rb_DESC= document.getElementById('DESC');
+
+    var context = this;
+    rb_ASC.addEventListener("change",function(){
+        context.newSort(event);
+    });
+    rb_DESC.addEventListener("change",function(){
+        context.newSort(event);
+    });
+}
+
+/**
+ * UserStorage.newSort - sort user list 
+ */
+UserStorage.prototype.newSort = function(event)
+{
+    this.sortMethod = event.target.value;
+    this.renderList();
+}
+
+/**
+ * UserStorage.sortUserList - sort userList
+ */
+UserStorage.prototype.sortUserList = function()
+{
+
+    return this.userList;
+}
+
 /** 
- * UserStorage method - create objects "User" for each item and push them into class property (array of objects)
+ * UserStorage.addToSorage - create objects "User" for each list item and push them into UserStorage.userList (array of objects)
  * 
  * @param array results 
  */
@@ -76,11 +119,12 @@ UserStorage.prototype.addToStorage = function(results)
         );
         uList.push(usr);
     });
+    // call render method
     this.renderList();
 }
 
 /**
- * UserStorage method - render user list
+ * UserStorage.renderList - render user list
  */
 UserStorage.prototype.renderList = function()
 {
@@ -88,13 +132,16 @@ UserStorage.prototype.renderList = function()
     // save context UserStorage
     var context = this;
 
-    // add event click on list item
+    // add event click on list item for open user card
     DOM_userList.addEventListener('click',function(){
         context.prepareOpenCard(event);
     }); 
 
+    // sort user list
+    var sortUserList = this.sortUserList();
+
     // render list
-    this.userList.forEach(function(item,index,array)
+    sortUserList.forEach(function(item,index,array)
     {
         // create DOM elements
         var DOM_item = document.createElement('div');
@@ -130,14 +177,14 @@ UserStorage.prototype.renderList = function()
 }
 
 /**
- * UserStorage method - prepare data and call User class method renderCard
+ * UserStorage.prepareOpenCard - prepare data and call User class method renderCard
  */
 UserStorage.prototype.prepareOpenCard = function(event)
 {
     var target = event.target;
     var DOM_class = target.className;
 
-    //find parent container wich contain dataset.id and then call render
+    //find parent container wich contain "dataset.id" and then call render card
     while(DOM_class != 'userList'){
         if(DOM_class == 'listItem'){
             var user = this.userList[target.dataset.id]
@@ -187,7 +234,7 @@ function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone
 }
 
 /**
- * User method - render user card
+ * User.renderCard- render user card
  * 
  */
 User.prototype.renderCard = function()
@@ -336,17 +383,18 @@ User.prototype.renderCard = function()
     // setting modal view
     DOM_wrap.style.display = "block";
 
-    // set event click on wrap
+    // set event click on wrap for delete card and hide wrap
     DOM_wrap.addEventListener("click",function(){
         this.style.display = "none";
         var userCard = document.getElementById('userCard');
-        console.log(userCard);
-        userCard.remove();
+        if(userCard){
+            userCard.remove();
+        }
     });
 
 }
 
 // init Storage
-var uStorage = new UserStorage(USERS_SRC);
+var uStorage = new UserStorage();
 uStorage.init();
 
