@@ -25,6 +25,7 @@ UserStorage.prototype.init = function()
     // find DOM elements
     var DOM_userList = document.getElementById('userList');
     var DOM_wrap = document.getElementById('wrap');
+    var DOM_userCard = document.getElementById('userCard');
     
     // add event click on list item for open user card
     var context = this;
@@ -34,9 +35,8 @@ UserStorage.prototype.init = function()
     // add event click on wrap for delete card and hide wrap
     DOM_wrap.addEventListener("click",function(){
         this.style.display = "none";
-        var userCard = document.getElementById('userCard');
-        if(userCard){
-            userCard.remove();
+        if(DOM_userCard){
+            DOM_userCard.remove();
         }
     });
 }
@@ -55,8 +55,8 @@ UserStorage.prototype.getUserList = function()
     xhr.timeout = this.timeout;
     xhr.ontimeout = function()
     {
-        var container = document.getElementById('container');
-        container.innerHTML = '<h1 class="error"> User data don`t loaded, please press F5 for reload the page</>';
+        var DOM_container = document.getElementById('container');
+        DOM_container.innerHTML = '<h1 class="error"> User data don`t loaded, please press F5 for reload the page</>';
     }
     xhr.send();
     xhr.onreadystatechange = function()
@@ -115,7 +115,7 @@ UserStorage.prototype.renderList = function()
     this.sortUserList();
 
     // render list
-    this.userList.forEach(function(item,index,array)
+    this.userList.forEach(function(item)
     {
         // create DOM elements
         var DOM_item = document.createElement('div');
