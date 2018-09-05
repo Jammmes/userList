@@ -9,20 +9,36 @@ function UserStorage()
     this.timeout = 15000;
     this.userList = [];
     this.sortMethod = 'ASC';
-    this.sortType = 'byFirstLetter';
 }
 
 /** 
- * UserStorage.init - prepare storage
+ * UserStorage.init - prepare storage, add events on DOM elements
  * 
  */
 UserStorage.prototype.init = function() 
 {
-    // set sorting
+    // sort settings
     this.prepareSort();
     // load and save user list
     this.getUserList();
+
+    // find DOM elements
+    var DOM_userList = document.getElementById('userList');
+    var DOM_wrap = document.getElementById('wrap');
     
+    // add event click on list item for open user card
+    var context = this;
+    DOM_userList.addEventListener('click',function(){
+        context.openCard(event);
+    }); 
+    // add event click on wrap for delete card and hide wrap
+    DOM_wrap.addEventListener("click",function(){
+        this.style.display = "none";
+        var userCard = document.getElementById('userCard');
+        if(userCard){
+            userCard.remove();
+        }
+    });
 }
 
 /**
@@ -39,7 +55,6 @@ UserStorage.prototype.getUserList = function()
     xhr.timeout = this.timeout;
     xhr.ontimeout = function()
     {
-        console.log('Time is up. Load fail.');
         var container = document.getElementById('container');
         container.innerHTML = '<h1 class="error"> User data don`t loaded, please press F5 for reload the page</>';
     }
@@ -55,60 +70,10 @@ UserStorage.prototype.getUserList = function()
     }
 }
 
-/**
- * UserStorage.prepareSort - set event on selector for sorting user list
- */
-UserStorage.prototype.prepareSort = function ()
-{
-    var rb_ASC = document.getElementById('ASC');
-    var rb_DESC= document.getElementById('DESC');
-
-    var context = this;
-    rb_ASC.addEventListener("change",function(){
-        context.newSort(event);
-    });
-    rb_DESC.addEventListener("change",function(){
-        context.newSort(event);
-    });
-}
-
-/**
- * UserStorage.newSort - sort user list 
- */
-UserStorage.prototype.newSort = function(event)
-{
-    this.sortMethod = event.target.value;
-    this.renderList();
-}
-
-/**
- * UserStorage.sortUserList - sort userList
- */
-UserStorage.prototype.sortUserList = function()
-{
-
-    function compare(a,b)
-    {
-        if(a.fName > b.fName){
-            return 1
-        };
-        if (a.fName < b.fName){
-            return -1
-        };
-        return 0;
-    };
-
-    this.userList.sort(compare);
-
-    if (this.sortMethod === 'DESC'){
-        this.userList.reverse();
-    }
-}
-
 /** 
  * UserStorage.addToSorage - create objects "User" for each list item and push them into UserStorage.userList (array of objects)
  * 
- * @param array results 
+ * @param array results - result loading data from url
  */
 UserStorage.prototype.addToStorage = function(results)
 {
@@ -134,7 +99,6 @@ UserStorage.prototype.addToStorage = function(results)
         );
         uList.push(usr);
     });
-    // call render method
     this.renderList();
 }
 
@@ -147,16 +111,7 @@ UserStorage.prototype.renderList = function()
     // clean old data
     DOM_userList.innerHTML = "";
 
-    // save context UserStorage
-    var context = this;
-
-    // add event click on list item for open user card
-    DOM_userList.addEventListener('click',function(){
-        context.prepareOpenCard(event);
-    }); 
-
     // sort user list
-    //var sortUserList = this.sortUserList();
     this.sortUserList();
 
     // render list
@@ -196,9 +151,58 @@ UserStorage.prototype.renderList = function()
 }
 
 /**
- * UserStorage.prepareOpenCard - prepare data and call User class method renderCard
+ * UserStorage.prepareSort - set event on selector for sorting user list
  */
-UserStorage.prototype.prepareOpenCard = function(event)
+UserStorage.prototype.prepareSort = function ()
+{
+    var rb_ASC = document.getElementById('ASC');
+    var rb_DESC= document.getElementById('DESC');
+
+    var context = this;
+    rb_ASC.addEventListener("change",function(){
+        context.newSort(event);
+    });
+    rb_DESC.addEventListener("change",function(){
+        context.newSort(event);
+    });
+}
+
+/**
+ * UserStorage.newSort - change sort method and re-render user list 
+ */
+UserStorage.prototype.newSort = function(event)
+{
+    this.sortMethod = event.target.value;
+    this.renderList();
+}
+
+/**
+ * UserStorage.sortUserList - sort userList
+ */
+UserStorage.prototype.sortUserList = function()
+{
+    function compare(a,b)
+    {
+        if(a.fName > b.fName){
+            return 1
+        };
+        if (a.fName < b.fName){
+            return -1
+        };
+        return 0;
+    };
+
+    this.userList.sort(compare);
+
+    if (this.sortMethod === 'DESC'){
+        this.userList.reverse();
+    }
+}
+
+/**
+ * UserStorage.openCard - prepare data and call User class method renderCard
+ */
+UserStorage.prototype.openCard = function(event)
 {
     var target = event.target;
     var DOM_class = target.className;
@@ -222,7 +226,6 @@ UserStorage.prototype.prepareOpenCard = function(event)
  */
 UserStorage.prototype.getUserbyId = function(id)
 {
-
     function isEqual(item){
         if (parseInt(item.id) === parseInt(id)){
             return true
@@ -230,7 +233,6 @@ UserStorage.prototype.getUserbyId = function(id)
     }
 
     var elem = this.userList.find(isEqual);
-    console.log(this.userList);
     return elem;
 }
 
@@ -271,7 +273,7 @@ function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone
 }
 
 /**
- * User.renderCard- render user card
+ * User.renderCard - render user card
  * 
  */
 User.prototype.renderCard = function()
@@ -420,19 +422,8 @@ User.prototype.renderCard = function()
 
     // setting modal view user card
     DOM_wrap.style.display = "block";
-
-    // set event click on wrap for delete card and hide wrap
-    DOM_wrap.addEventListener("click",function(){
-        this.style.display = "none";
-        var userCard = document.getElementById('userCard');
-        if(userCard){
-            userCard.remove();
-        }
-    });
-
 }
 
 // init Storage
 var uStorage = new UserStorage();
-uStorage.init();
-
+uStorage.init();   
