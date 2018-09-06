@@ -25,7 +25,7 @@ UserStorage.prototype.init = function()
     // find DOM elements
     var DOM_userList = document.getElementById('userList');
     var DOM_wrap = document.getElementById('wrap');
-    var DOM_userCard = document.getElementById('userCard');
+
     
     // add event click on list item for open user card
     var context = this;
@@ -34,6 +34,7 @@ UserStorage.prototype.init = function()
     }); 
     // add event click on wrap for delete card and hide wrap
     DOM_wrap.addEventListener("click",function(){
+        var DOM_userCard = document.getElementById('userCard');
         this.style.display = "none";
         if(DOM_userCard){
             DOM_userCard.remove();
