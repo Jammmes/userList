@@ -3,41 +3,55 @@
  * Class UserStorage - load,render,sort the userlist
  * 
  */
-function UserStorage()
-{
+function UserStorage() {
     this.url = "https://api.randomuser.me/1.0/?results=50&nat=gb,us&inc=gender,name,location,email,phone,picture";
     this.timeout = 15000;
     this.userList = [];
     this.sortMethod = 'ASC';
+    this.userModel = {
+        'id' : 0, 
+        'gender' : '', 
+        'email' : '', 
+        'city' : '', 
+        'postcode' : '', 
+        'state' : '', 
+        'street' : '', 
+        'title' : '', 
+        'fName' : '', 
+        'lName' : '', 
+        'phone' : '', 
+        'smallPic' : '', 
+        'mediumPic' : '', 
+        'largePic' : '', 
+    };
 }
 
 /** 
  * UserStorage.init - prepare storage, add events on DOM elements
  * 
  */
-UserStorage.prototype.init = function() 
-{
+UserStorage.prototype.init = function() {
     // sort settings
     this.prepareSort();
     // load and save user list
     this.getUserList();
 
     // find DOM elements
-    var DOM_userList = document.getElementById('userList');
-    var DOM_wrap = document.getElementById('wrap');
+    var userList = document.getElementById('userList');
+    var wrap = document.getElementById('wrap');
 
-    
     // add event click on list item for open user card
-    var context = this;
-    DOM_userList.addEventListener('click',function(){
-        context.openCard(event);
+    var openCard = this.openCard;
+
+    userList.addEventListener('click',function() {
+       openCard(event);
     }); 
     // add event click on wrap for delete card and hide wrap
-    DOM_wrap.addEventListener("click",function(){
-        var DOM_userCard = document.getElementById('userCard');
+    wrap.addEventListener("click",function() {
+        var userCard = document.getElementById('userCard');
         this.style.display = "none";
-        if(DOM_userCard){
-            DOM_userCard.remove();
+        if(userCard){
+            userCard.remove();
         }
     });
 }
@@ -45,10 +59,9 @@ UserStorage.prototype.init = function()
 /**
  * UserStorage.getUserList - load and save user list
  */
-UserStorage.prototype.getUserList = function()
-{
-    // save context storage
-    var context = this;
+UserStorage.prototype.getUserList = function() {
+    // save method storage
+    var addToStorage = this.addToStorage;
     //
     var xhr = new XMLHttpRequest();
     var url = this.url;
@@ -56,16 +69,15 @@ UserStorage.prototype.getUserList = function()
     xhr.timeout = this.timeout;
     xhr.ontimeout = function()
     {
-        var DOM_container = document.getElementById('container');
-        DOM_container.innerHTML = '<h1 class="error"> User data don`t loaded, please press F5 for reload the page</>';
+        var container = document.getElementById('container');
+        container.innerHTML = '<h1 class="error"> User data don`t loaded, please press F5 for reload the page</>';
     }
     xhr.send();
-    xhr.onreadystatechange = function()
-    {
+    xhr.onreadystatechange = function() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
             if (xhr.status === 200) {
                 var loadResults = JSON.parse(xhr.responseText);
-                context.addToStorage(loadResults);
+               addToStorage(loadResults);
             }
         }
     }
@@ -76,28 +88,28 @@ UserStorage.prototype.getUserList = function()
  * 
  * @param array results - result loading data from url
  */
-UserStorage.prototype.addToStorage = function(results)
-{
+UserStorage.prototype.addToStorage = function(results) {
     this.userList = [];
+    var userModel = this.userModel
     var uList = this.userList;
-    results['results'].forEach(function(item,index) 
-    {
-        var usr = new User(
-            index,
-            item.gender,
-            item.email,
-            item.location.city,
-            item.location.postcode,
-            item.location.state,
-            item.location.street,
-            item.name.title,
-            item.name.first,
-            item.name.last,
-            item.phone,
-            item.picture.thumbnail,
-            item.picture.medium,
-            item.picture.large
-        );
+    results['results'].forEach(function(item,index) {
+        
+        userModel.id = index,
+        userModel.gender = item.gender,
+        userModel.email = item.email,
+        userModel.city = item.location.city,
+        userModel.postcode = item.location.postcode,
+        userModel.state = item.location.state,
+        userModel.street = item.location.street,
+        userModel.title = item.name.title,
+        userModel.fName = item.name.first,
+        userModel.lName = item.name.last,
+        userModel.phone = item.phone,
+        userModel.smallPic = item.picture.thumbnail,
+        userModel.mediumPic = item.picture.medium,
+        userModel.largePic = item.picture.large;
+        
+        var usr = new User(userModel);
         uList.push(usr);
     });
     this.renderList();
@@ -106,73 +118,64 @@ UserStorage.prototype.addToStorage = function(results)
 /**
  * UserStorage.renderList - render user list
  */
-UserStorage.prototype.renderList = function()
-{
-    var DOM_userList = document.getElementById('userList');
+UserStorage.prototype.renderList = function() {
+    var userList = document.getElementById('userList');
     // clean old data
-    DOM_userList.innerHTML = "";
+    userList.innerHTML = "";
 
     // sort user list
     this.sortUserList();
 
     // render list
-    this.userList.forEach(function(item)
+    this.userList.forEach(function(user)
     {
         // create DOM elements
-        var DOM_item = document.createElement('div');
-        var DOM_picture = document.createElement('img');
-        var DOM_title = document.createElement('div');
-        var DOM_fName = document.createElement('div');
-        var DOM_lName = document.createElement('div');
-        // get data from User object
-        var picture = item.mediumPic;
-        var title = item.title;
-        var fName = item.fName;
-        var lName = item.lName;
-        var id = item.id;
+        var item = document.createElement('div');
+        var picture = document.createElement('img');
+        var title = document.createElement('div');
+        var fName = document.createElement('div');
+        var lName = document.createElement('div');
         // add classes to DOM elements
-        DOM_item.classList.add('listItem');
-        DOM_picture.classList.add('listItem__picture');
-        DOM_title.classList.add('listItem__title');
-        DOM_fName.classList.add('listItem__fName');
-        DOM_lName.classList.add('listItem__lName');
+        item.classList.add('listItem');
+        picture.classList.add('listItem__picture');
+        title.classList.add('listItem__title');
+        fName.classList.add('listItem__fName');
+        lName.classList.add('listItem__lName');
         // set data in DOM element        
-        DOM_item.dataset.id = id;
-        DOM_picture.src = picture;
-        DOM_title.innerHTML = title;
-        DOM_fName.innerHTML = fName;
-        DOM_lName.innerHTML = lName;
+        item.dataset.id = user.id;
+        picture.src = user.mediumPic;
+        title.innerHTML = user.title;
+        fName.innerHTML = user.fName;
+        lName.innerHTML = user.isEquallName;
         // create DOM structure
-        DOM_userList.appendChild(DOM_item);
-        DOM_item.appendChild(DOM_picture);
-        DOM_item.appendChild(DOM_title);
-        DOM_item.appendChild(DOM_fName);
-        DOM_item.appendChild(DOM_lName);
+        userList.appendChild(item);
+        item.appendChild(picture);
+        item.appendChild(title);
+        item.appendChild(fName);
+        item.appendChild(lName);
     })
 }
 
 /**
  * UserStorage.prepareSort - set event on selector for sorting user list
  */
-UserStorage.prototype.prepareSort = function ()
-{
-    var rb_ASC = document.getElementById('ASC');
-    var rb_DESC= document.getElementById('DESC');
+UserStorage.prototype.prepareSort = function () {
+    var asc = document.getElementById('ASC');
+    var desc = document.getElementById('DESC');
+    var newSort = this.newSort;
 
-    var context = this;
-    rb_ASC.addEventListener("change",function(){
-        context.newSort(event);
+    asc.addEventListener("change",function(){
+        newSort(event);
     });
-    rb_DESC.addEventListener("change",function(){
-        context.newSort(event);
+    desc.addEventListener("change",function(){
+        newSort(event);
     });
 }
 
 /**
  * UserStorage.newSort - change sort method and re-render user list 
  */
-UserStorage.prototype.newSort = function(event)
-{
+UserStorage.prototype.newSort = function(event) {
     this.sortMethod = event.target.value;
     this.renderList();
 }
@@ -180,14 +183,12 @@ UserStorage.prototype.newSort = function(event)
 /**
  * UserStorage.sortUserList - sort userList
  */
-UserStorage.prototype.sortUserList = function()
-{
-    function compare(a,b)
-    {
-        if(a.fName > b.fName){
+UserStorage.prototype.sortUserList = function() {
+    function compare(a,b) {
+        if(a.fName > b.fName) {
             return 1
         };
-        if (a.fName < b.fName){
+        if (a.fName < b.fName) {
             return -1
         };
         return 0;
@@ -195,7 +196,7 @@ UserStorage.prototype.sortUserList = function()
 
     this.userList.sort(compare);
 
-    if (this.sortMethod === 'DESC'){
+    if (this.sortMethod === 'DESC') {
         this.userList.reverse();
     }
 }
@@ -203,20 +204,19 @@ UserStorage.prototype.sortUserList = function()
 /**
  * UserStorage.openCard - prepare data and call User class method renderCard
  */
-UserStorage.prototype.openCard = function(event)
-{
+UserStorage.prototype.openCard = function(event) {
     var target = event.target;
-    var DOM_class = target.className;
+    var className = target.className;
 
     //find parent container wich contain "dataset.id" and then call render card
-    while(DOM_class != 'userList'){
-        if(DOM_class == 'listItem'){
+    while(className != 'userList') {
+        if(className == 'listItem') {
             var user = this.getUserbyId(target.dataset.id);
             user.renderCard();
             return;
         }
         target = target.parentNode;
-        DOM_class = target.className;
+        className = target.className;
     }
 }
 
@@ -225,10 +225,9 @@ UserStorage.prototype.openCard = function(event)
  * 
  * @param int id 
  */
-UserStorage.prototype.getUserbyId = function(id)
-{
+UserStorage.prototype.getUserbyId = function(id) {
     function isEqual(item){
-        if (parseInt(item.id) === parseInt(id)){
+        if (parseInt(item.id) === parseInt(id)) {
             return true
         }
     }
@@ -240,191 +239,170 @@ UserStorage.prototype.getUserbyId = function(id)
 /** 
  * Class User - save user data and render userCard
  * 
- * @param int id 
- * @param string gender 
- * @param string email 
- * @param string city 
- * @param string postcode 
- * @param string state 
- * @param string street 
- * @param string title 
- * @param string fName 
- * @param string lName 
- * @param string phone 
- * @param string smallPic 
- * @param string mediumPic 
- * @param string largePic 
+ * @param object userModel 
  */
-function User(id,gender,email,city,postcode,state,street,title,fName,lName,phone,smallPic,mediumPic,largePic)
-{
-    this.id = id;
-    this.gender = gender;
-    this.email = email;
-    this.city = city;
-    this.postcode = postcode;
-    this.state = state;
-    this.street = street;
-    this.title = title;
-    this.fName = fName;
-    this.lName = lName;
-    this.phone = phone;
-    this.smallPic = smallPic;
-    this.mediumPic = mediumPic;
-    this.largePic = largePic;
+function User(userModel) {
+    this.id = userModel.id;
+    this.gender = userModel.gender;
+    this.email = userModel.email;
+    this.city = userModel.city;
+    this.postcode = userModel.postcode;
+    this.state = userModel.state;
+    this.street = userModel.street;
+    this.title = userModel.title;
+    this.fName = userModel.fName;
+    this.lName = userModel.lName;
+    this.phone = userModel.phone;
+    this.smallPic = userModel.smallPic;
+    this.mediumPic = userModel.mediumPic;
+    this.largePic = userModel.largePic;
 }
 
 /**
  * User.renderCard - render user card
  * 
  */
-User.prototype.renderCard = function()
-{
+User.prototype.renderCard = function() {
     // find some DOM elements
-    var DOM_mainContainer = document.getElementById('container');
-    var DOM_wrap = document.getElementById('wrap');
-    //create DOM elements
-    var DOM_userCard = document.createElement('div');
+    var mainContainer = document.getElementById('container');
+    var wrap = document.getElementById('wrap');
+    var userCard = document.createElement('div');
 
-    var DOM_cardBlock_img = document.createElement('div');
-    var DOM_value_img = document.createElement('img');
-
-    var DOM_cardBlock_id = document.createElement('div');
-    var DOM_caption_id  = document.createElement('div');
-    var DOM_value_id  = document.createElement('div');
-
-    var DOM_cardBlock_common_name = document.createElement('div');
-    var DOM_caption_name = document.createElement('div');
-    var DOM_cardBlock_clear = document.createElement('div');
-    var DOM_value_title = document.createElement('div');
-    var DOM_value_fName = document.createElement('div');
-    var DOM_value_lName = document.createElement('div');
-
-    var DOM_cardBlock_street = document.createElement('div');
-    var DOM_caption_street = document.createElement('div');
-    var DOM_value_street = document.createElement('div');
-
-    var DOM_cardBlock_city = document.createElement('div');
-    var DOM_caption_city = document.createElement('div');
-    var DOM_value_city = document.createElement('div');
-
-    var DOM_cardBlock_state = document.createElement('div');
-    var DOM_caption_state = document.createElement('div');
-    var DOM_value_state = document.createElement('div');
-
-    var DOM_cardBlock_postcode = document.createElement('div');
-    var DOM_caption_postcode = document.createElement('div');
-    var DOM_value_postcode = document.createElement('div');
-
-    var DOM_cardBlock_email = document.createElement('div');
-    var DOM_caption_email = document.createElement('div');
-    var DOM_value_email = document.createElement('div');
-
-    var DOM_cardBlock_phone = document.createElement('div');
-    var DOM_caption_phone = document.createElement('div');
-    var DOM_value_phone = document.createElement('div');
+    userCard.classList.add('userCard');
+    userCard.setAttribute('id','userCard');
     
-    // add classes/id to DOM elements
-    DOM_userCard.classList.add('userCard');
-    DOM_userCard.setAttribute('id','userCard');
+    //prepare to create DOM elements
 
-    DOM_cardBlock_img.classList.add('cardBlock');
-    DOM_cardBlock_id.classList.add('cardBlock');
-    DOM_cardBlock_common_name.classList.add('cardBlock');
-    DOM_cardBlock_clear.classList.add('cardBlock_clear');
-    DOM_cardBlock_city.classList.add('cardBlock');
-    DOM_cardBlock_street.classList.add('cardBlock');
-    DOM_cardBlock_state.classList.add('cardBlock');
-    DOM_cardBlock_postcode.classList.add('cardBlock');
-    DOM_cardBlock_email.classList.add('cardBlock');
-    DOM_cardBlock_phone.classList.add('cardBlock');
+    var blocks = {
+        'cardBlock_img' : '',
+        'cardBlock_id' : '',
+        'cardBlock_common_name' : '',
+        'cardBlock_clear' : '',
+        'cardBlock_city' : '',
+        'cardBlock_street' : '',
+        'cardBlock_state' : '',
+        'cardBlock_postcode' : '',
+        'cardBlock_email' : '',
+        'cardBlock_phone' : ''
+    };
+    var captions = {
+        'caption_id' : '',
+        'caption_name' : '',
+        'caption_city' : '',
+        'caption_street' : '',
+        'caption_state' : '',
+        'caption_postcode' : '',
+        'caption_email' : '',
+        'caption_phone' : ''
+    };
+    var values = {
+        'value_img' : '',
+        'value_id' : '',
+        'value_title' : '',
+        'value_fName' : '',
+        'value_lName' : '',
+        'value_city' : '',
+        'value_street' : '',
+        'value_state' : '',
+        'value_postcode' : '',
+        'value_email' : '',
+        'value_phone' : ''
+    };
 
-    DOM_caption_id.classList.add('cardBlock__caption');
-    DOM_caption_name.classList.add('cardBlock__caption');
-    DOM_caption_city.classList.add('cardBlock__caption');
-    DOM_caption_street.classList.add('cardBlock__caption');
-    DOM_caption_state.classList.add('cardBlock__caption');
-    DOM_caption_postcode.classList.add('cardBlock__caption');
-    DOM_caption_email.classList.add('cardBlock__caption');
-    DOM_caption_phone.classList.add('cardBlock__caption');
+//create DOM elements and set classes
 
-    DOM_value_img.classList.add('cardBlock__value');
-    DOM_value_id.classList.add('cardBlock__value');
-    DOM_value_title.classList.add('cardBlock__value');
-    DOM_value_fName.classList.add('cardBlock__value');
-    DOM_value_lName.classList.add('cardBlock__value');
-    DOM_value_city.classList.add('cardBlock__value');
-    DOM_value_street.classList.add('cardBlock__value');
-    DOM_value_state.classList.add('cardBlock__value');
-    DOM_value_postcode.classList.add('cardBlock__value');
-    DOM_value_email.classList.add('cardBlock__value');
-    DOM_value_phone.classList.add('cardBlock__value');
-    // set data in DOM elements
-    DOM_caption_id.innerHTML = "ID: ";
-    DOM_caption_name.innerHTML = "NAME: ";
-    DOM_caption_city.innerHTML = "CITY: ";
-    DOM_caption_street.innerHTML = "STREET: ";
-    DOM_caption_state.innerHTML = "STATE: ";
-    DOM_caption_postcode.innerHTML = "POSTCODE: ";
-    DOM_caption_email.innerHTML = "EMAIL: ";
-    DOM_caption_phone.innerHTML = "PHONE: ";
-
-    DOM_value_img.src = this.largePic;
-    DOM_value_id.innerHTML = this.id;
-    DOM_value_title.innerHTML = this.title;
-    DOM_value_fName.innerHTML = this.fName;
-    DOM_value_lName.innerHTML = this.lName;
-    DOM_value_city.innerHTML = this.city;
-    DOM_value_street.innerHTML = this.street;
-    DOM_value_state.innerHTML = this.state;
-    DOM_value_postcode.innerHTML = this.postcode;
-    DOM_value_email.innerHTML = this.email;
-    DOM_value_phone.innerHTML = this.phone;
-    //create DOM structure
-    DOM_mainContainer.appendChild(DOM_userCard);
-
-    DOM_userCard.appendChild(DOM_cardBlock_img);
-    DOM_userCard.appendChild(DOM_cardBlock_id);
-    DOM_userCard.appendChild(DOM_cardBlock_common_name);
-    DOM_userCard.appendChild(DOM_cardBlock_street);
-    DOM_userCard.appendChild(DOM_cardBlock_city);
-    DOM_userCard.appendChild(DOM_cardBlock_state);
-    DOM_userCard.appendChild(DOM_cardBlock_postcode);
-    DOM_userCard.appendChild(DOM_cardBlock_email);
-    DOM_userCard.appendChild(DOM_cardBlock_phone);
-
-    DOM_cardBlock_img.appendChild(DOM_value_img);
-
-    DOM_cardBlock_id.appendChild(DOM_caption_id);
-    DOM_cardBlock_id.appendChild(DOM_value_id);
-
-    DOM_cardBlock_common_name.appendChild(DOM_caption_name);
-    DOM_cardBlock_common_name.appendChild(DOM_cardBlock_clear);
-    DOM_cardBlock_clear.appendChild(DOM_value_title);
-    DOM_cardBlock_clear.appendChild(DOM_value_fName);
-    DOM_cardBlock_clear.appendChild(DOM_value_lName);
-
-    DOM_cardBlock_street.appendChild(DOM_caption_street);
-    DOM_cardBlock_street.appendChild(DOM_value_street);
-
-    DOM_cardBlock_city.appendChild(DOM_caption_city);
-    DOM_cardBlock_city.appendChild(DOM_value_city);
-
-    DOM_cardBlock_state.appendChild(DOM_caption_state);
-    DOM_cardBlock_state.appendChild(DOM_value_state);
-
-    DOM_cardBlock_postcode.appendChild(DOM_caption_postcode);
-    DOM_cardBlock_postcode.appendChild(DOM_value_postcode);
-
-    DOM_cardBlock_email.appendChild(DOM_caption_email);
-    DOM_cardBlock_email.appendChild(DOM_value_email);
-
-    DOM_cardBlock_phone.appendChild(DOM_caption_phone);
-    DOM_cardBlock_phone.appendChild(DOM_value_phone);
-
-    // setting modal view user card
-    DOM_wrap.style.display = "block";
+for (element in blocks){
+    blocks[element] = document.createElement('div');
+    if (element == 'cardBlock_clear'){
+        blocks[element].classList.add('cardBlock_clear');
+    }else{
+        blocks[element].classList.add('cardBlock');
+    }
 }
 
-// init Storage
+for (element in captions){
+    captions[element] = document.createElement('div');
+    captions[element].classList.add('cardBlock__caption');
+}
+
+for (element in values){
+    if (element == 'value_img'){
+        values[element] = document.createElement('img');
+    }else{
+        values[element] = document.createElement('div');
+    };
+    values[element].classList.add('cardBlock__value');
+}
+
+    // set data in DOM elements
+    captions.caption_id.innerHTML = "ID: ";
+    captions.caption_name.innerHTML = "NAME: ";
+    captions.caption_city.innerHTML = "CITY: ";
+    captions.caption_street.innerHTML = "STREET: ";
+    captions.caption_state.innerHTML = "STATE: ";
+    captions.caption_postcode.innerHTML = "POSTCODE: ";
+    captions.caption_email.innerHTML = "EMAIL: ";
+    captions.caption_phone.innerHTML = "PHONE: ";
+
+    values.value_img.src = this.largePic;
+    values.value_id.innerHTML = this.id;
+    values.value_title.innerHTML = this.title;
+    values.value_fName.innerHTML = this.fName;
+    values.value_lName.innerHTML = this.lName;
+    values.value_city.innerHTML = this.city;
+    values.value_street.innerHTML = this.street;
+    values.value_state.innerHTML = this.state;
+    values.value_postcode.innerHTML = this.postcode;
+    values.value_email.innerHTML = this.email;
+    values.value_phone.innerHTML = this.phone;
+    
+    //create DOM structure
+    mainContainer.appendChild(userCard);
+    
+    for (block in blocks){
+        userCard.appendChild(blocks[block]); 
+    }
+
+    blocks.cardBlock_img.appendChild(values.value_img);
+
+    blocks.cardBlock_id.appendChild(captions.caption_id);
+    blocks.cardBlock_id.appendChild(values.value_id);
+
+    blocks.cardBlock_common_name.appendChild(captions.caption_name);
+    blocks.cardBlock_common_name.appendChild(blocks.cardBlock_clear);
+
+    blocks.cardBlock_clear.appendChild(values.value_title);
+    blocks.cardBlock_clear.appendChild(values.value_fName);
+    blocks.cardBlock_clear.appendChild(values.value_lName);
+
+    blocks.cardBlock_street.appendChild(captions.caption_street);
+    blocks.cardBlock_street.appendChild(values.value_street);
+
+    blocks.cardBlock_city.appendChild(captions.caption_city);
+    blocks.cardBlock_city.appendChild(values.value_city);
+
+    blocks.cardBlock_state.appendChild(captions.caption_state);
+    blocks.cardBlock_state.appendChild(values.value_state);
+
+    blocks.cardBlock_postcode.appendChild(captions.caption_postcode);
+    blocks.cardBlock_postcode.appendChild(values.value_postcode);
+
+    blocks.cardBlock_email.appendChild(captions.caption_email);
+    blocks.cardBlock_email.appendChild(values.value_email);
+
+    blocks.cardBlock_phone.appendChild(captions.caption_phone);
+    blocks.cardBlock_phone.appendChild(values.value_phone);
+
+    // setting modal view user card
+    wrap.style.display = "block";
+}
+
+// init storage
 var uStorage = new UserStorage();
+
+// bind methods 
+uStorage.openCard = uStorage.openCard.bind(uStorage);
+uStorage.addToStorage = uStorage.addToStorage.bind(uStorage);
+uStorage.newSort = uStorage.newSort.bind(uStorage);
+
 uStorage.init();   
